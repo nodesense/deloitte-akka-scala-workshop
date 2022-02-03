@@ -1,8 +1,11 @@
 package workshop.basics
 
+import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 object S035_BlockingFuture extends App {
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
   // used by 'time' method
   implicit val baseTime = System.currentTimeMillis

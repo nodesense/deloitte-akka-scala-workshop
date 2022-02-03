@@ -52,16 +52,30 @@ object AkkaPersistenceExample extends  App {
         state = State(count = state.count + 1)
         // persist now.. todo
         // whenever there is state change, where you want to persiste state
+        // the state object data shall be seriazlied and then it will be saved
+        // in application.config
+//        akka.actor.warn-about-java-serializer-usage=off
+//        akka.actor.allow-java-serialization=on
+//
         saveSnapshot(state)
         println("Total jobs done ", state)
         sender.tell(JobCompleted(s"Done ${job.name}"), self)
       }
-      case _ => println("Worker default message")
+      case t:Object => println("Worker default message",  t)
     }
 
     // when akka goes into recovery mode, we have few messages send by system
     // to pul the data from snapshop and recover teh data
     val receiveRecover : Receive = {
+          // message send here for snapshop recovery, completion notification
+      case SnapshotOffer(metadata, snapshot: State ) => {
+        println("now snapshot given from akka persistance to actor", snapshot)
+        // now initialize akka state from snapshop
+        state = snapshot
+      }
+      case RecoveryCompleted => {
+        println("Recovery completed")
+      }
       case _ => println("receiveRecover")
     }
 

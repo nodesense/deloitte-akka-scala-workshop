@@ -2,8 +2,8 @@ package workshop.basics
 
 import scala.concurrent.Future
 import scala.util.{Failure, Random, Success}
-
 object S034_FutureBasicsApp extends App {
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
 
   val r = new Random()
 
