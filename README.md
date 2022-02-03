@@ -1,0 +1,2 @@
+# Scala Workshop
+# Akka workshop
