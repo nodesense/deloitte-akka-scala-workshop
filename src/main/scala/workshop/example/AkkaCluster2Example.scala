@@ -5,7 +5,9 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberDowned, MemberRemoved, MemberUp}
 import com.typesafe.config.ConfigFactory
 import workshop.models.{ClusterJob, ClusterJobCompleted}
+import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 
@@ -66,6 +68,13 @@ object AkkaCluster2Example extends  App {
       // publish the message that contains the address of the worker
       // BUGGY- preStart called only once, the node join later will not receive address
     }
+
+    override def postStop(): Unit = {
+      println("Cluster 2 Worker preStart")
+
+      // publish the message that contains the address of the worker
+      // BUGGY- preStart called only once, the node join later will not receive address
+    }
   }
 
 
@@ -85,4 +94,10 @@ val cluster = Cluster(system)
     system.actorOf(Props[WorkerActor], name="worker")
 
   }
+//
+//  Future {
+//    Thread.sleep(120 * 1000)
+//    println("Terminating")
+//    system.terminate()
+//  }
 }
