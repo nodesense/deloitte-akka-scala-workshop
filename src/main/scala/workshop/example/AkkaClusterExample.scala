@@ -76,6 +76,7 @@ object AkkaClusterExample extends  App {
 
     def receive = {
       case msg:String if msg == "RegisterWorker" => {
+        println("RegisterWorker at master")
         // here receive the worker information
         backends = sender() // sender is the worker running on cluster 2
       }
@@ -83,7 +84,7 @@ object AkkaClusterExample extends  App {
         //TODO: forward to worker running on cluster 2
          println("At master worker", job)
 
-        context.actorSelection("akka://training@127.0.0.1:2552/user/worker").forward(job)
+        //context.actorSelection("akka://training@127.0.0.1:2552/user/worker").forward(job)
 
         if ( backends != null)
         backends.forward(job)
@@ -111,8 +112,8 @@ val cluster = Cluster(system)
   }
 
   Future {
-    Thread.sleep(30 * 1000)
+    Thread.sleep(60 * 1000)
     println("Sending job")
-    system.actorSelection("akka://training@127.0.0.1:2551/user/master").tell(ClusterJob("Print 100 pages"), null)
+    system.actorSelection("akka://training@127.0.0.1:2551/user/master").tell(ClusterJob("Print 999 pages"), null)
   }
 }

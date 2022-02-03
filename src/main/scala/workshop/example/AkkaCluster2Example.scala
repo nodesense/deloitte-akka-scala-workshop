@@ -12,6 +12,11 @@ import scala.language.postfixOps
 object AkkaCluster2Example extends  App {
 
 
+  println("Application config path ", args)
+
+  val configPath = if (args.length == 0) "application2" else args(0)
+  println("Starting worker cluster with config ", configPath)
+
   class WorkerActor extends Actor {
     println("WorkerActor Created")
     println("Actor path ", akka.serialization.Serialization.serializedActorPath(self))
@@ -38,9 +43,12 @@ object AkkaCluster2Example extends  App {
         if (m.roles.contains("frontend")) {
            // we don't have actor reference..
           println("Root Actor Path ", RootActorPath(m.address))
-          val targetMasterPath = RootActorPath(m.address) / "users" / "master"
+          val targetMasterPath = RootActorPath(m.address) / "user" / "master"
           println("Master Actor Path is ", targetMasterPath)
           // now send message to master work dynamically
+
+          //context.actorSelection("akka://training@127.0.0.1:2551/user/master").tell("RegisterWorker", self)
+
           context.actorSelection(targetMasterPath).tell("RegisterWorker", self)
         }
 
@@ -64,7 +72,7 @@ object AkkaCluster2Example extends  App {
   // we should not reference application.conf ie cluster config
   // we should refere application2.conf
 
-val config = ConfigFactory.load("application2")
+val config = ConfigFactory.load(configPath)
 val system = ActorSystem("training", config)
 
   // create a cluster
