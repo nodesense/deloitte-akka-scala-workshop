@@ -14,6 +14,11 @@ lazy val akkaHttpVersion  = "10.2.0-M1"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % akkaVersion
 libraryDependencies += "com.typesafe.akka" %% "akka-persistence" % akkaVersion
 
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion
+
+
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.3"
 
