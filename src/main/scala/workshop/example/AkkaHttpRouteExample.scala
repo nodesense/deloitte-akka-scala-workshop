@@ -21,28 +21,87 @@ import akka.http.scaladsl.model.HttpMethods.{GET}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.DefaultJsonProtocol
 
+
 // akka-http is low level api to build http(s) end points
 // alternatively you can play frmaewokr which is build on top of akka
 // both play and akka-http very well integrated and deployed as part of clusters
-object AkkaHttpExample extends  App {
+object AkkaHttpRouteExample extends  App {
   implicit  val system = ActorSystem("training")
   implicit  val timeout = Timeout(10 seconds) // postfix imports help
 
-  val requestHandler: HttpRequest => HttpResponse = {
-    case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
-      HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-        "<h2>Hello</h2>"))
+  // routing, DSL - domain specific language
 
-    case HttpRequest(GET, Uri.Path("/morning"), _, _, _) =>
-      HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-        "<h2>Hello good morning</h2>"))
+  val homeRoute = path("") {
+    get {
+      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
+        "<h2>Home</h2>"))
+    }
   }
 
-  // server listen on port number 8888
-  // two end points
-  // http://localhost:8888
-  // http://localhost:8888/morning
-  Http().bindAndHandleSync(requestHandler, "localhost", 8888)
+  // REST API to work with invoices
+  // GET /invoices  -- get all the invoices
+  // GET /invoices/12323 -- get speicifc invoice from api
+  // DELETE /invoices/12323 -- delete a specific invoice in db
+  // PUT /invoices/12323  -- update existing invoice
+      // payload json body
+  // POST /invoices -- create new invoice
+       //payload
+
+  val invoicesRoute = pathPrefix("invoices") {
+    concat(
+      pathEnd {  // /invoices
+        concat (
+          get {
+            // GET /invoices
+            val response =  HttpEntity(ContentTypes.`application/json`,
+              """
+                |[
+                |  {
+                |    "id":1,"Amount":123.45
+                |    },
+                |      {
+                |    "id":2,"Amount":2222.65
+                |    }
+                |    ]
+                |""".stripMargin)
+            complete(response)
+          }
+        )
+      },
+      path(Segment) {
+        // GET /invoices/12323
+        id => // 12323
+          concat(
+            get {
+              println("REceived ", id)
+              val response =  HttpEntity(ContentTypes.`application/json`,
+                """
+                  |  {
+                  |    "id":100,"Amount":123.45
+                  |    }
+                  |""".stripMargin)
+              complete(response)
+            },
+            delete {
+              // use postman
+              // DELETE /invoices/1234
+              println("REceived delete ", id)
+              complete(StatusCodes.OK)
+            }
+          )
+      }
+    )
+  }
+
+  // ~ concat multiple routes
+  // GET http://localhost:8888
+  // GET http://localhost:8888/invoices
+
+  // GET http://localhost:8888/invoices/100
+
+  // DELETE http://localhost:8888/invoices/100
+
+  Http().bindAndHandle(homeRoute ~ invoicesRoute  , "localhost", 8888)
 
 
 }
