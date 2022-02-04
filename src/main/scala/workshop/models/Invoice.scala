@@ -1,10 +1,12 @@
 package workshop.models
 
+
+// Domain object, Database, data model, ML/AI
 case class Invoice(id:  Int, customerId: Int, amount: Double)
 
 // final case class Invoices(invoices: Seq[Invoice])
 
-
+// REST APIs compatible, create models for HTTP Request and HTTP Response
 // Requests
 // single instance
 case object GetAllInvoices
